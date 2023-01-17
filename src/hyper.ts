@@ -3,9 +3,10 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
-import axios from "axios";
 import { BadRequest } from "@tsed/exceptions";
 import type { HTTPMethod } from "../src/uri";
+import type { AxiosResponse } from "axios";
+import axios from "axios";
 
 interface ILink {
   rel: string;
@@ -52,30 +53,26 @@ class Hypermedia implements IHypermedia {
     return this.links;
   }
 
-  public async follow(rel: string): Promise<any> {
+  private async fetchData(rel: string): Promise<AxiosResponse> {
     const link = this.only(rel);
     if (!link) {
       throw new BadRequest(`Link with rel ${rel} not found`);
     }
     const url = new URL(link.href);
-    const response = await axios({
+    return await axios({
       method: link.method,
       url: url.href,
     });
+  }
+
+  public async follow(rel: string): Promise<any> {
+    const response = await this.fetchData(rel);
     return response.data;
   }
 
   public async chain(rel: string): Promise<Hypermedia> {
-    const link = this.only(rel);
-    if (!link) {
-      throw new BadRequest(`Link with rel ${rel} not found`);
-    }
-    const url = new URL(link.href);
-    const response = await axios({
-      method: link.method,
-      url: url.href,
-    });
-    return new Hypermedia(url, response.data.links);
+    const response = await this.fetchData(rel);
+    return new Hypermedia(new URL(response.data.link.href), response.data.links);
   }
   public all(): ILink[] {
     return this.links;
