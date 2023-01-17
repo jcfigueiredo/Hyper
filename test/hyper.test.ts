@@ -16,14 +16,6 @@ describe("Hypermedia", () => {
 
   const links = [selfLink, updateLink, deleteLink, notesLink];
 
-  it("should return links", async () => {
-    const address = new URL("http://localhost/hypermedia");
-
-    nock("http://localhost/").get(address.pathname).reply(200, links);
-    const hypermedia = await Hypermedia.from(address.href);
-    expect(hypermedia.getLinks()).toEqual(links);
-  });
-
   it("should throw an error when passed an invalid address", () => {
     const address = "invalid-address";
     expect(Hypermedia.from(address)).rejects.toThrowError(BadRequest);

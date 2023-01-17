@@ -49,9 +49,6 @@ class Hypermedia implements IHypermedia {
     const response = await axios.get<ILink[]>(url.href);
     return new Hypermedia(url, response.data);
   }
-  public getLinks(): ILink[] {
-    return this.links;
-  }
 
   private async fetchData(rel: string): Promise<AxiosResponse> {
     const link = this.only(rel);
@@ -74,6 +71,7 @@ class Hypermedia implements IHypermedia {
     const response = await this.fetchData(rel);
     return new Hypermedia(new URL(response.data.link.href), response.data.links);
   }
+
   public all(): ILink[] {
     return this.links;
   }
