@@ -3,6 +3,7 @@
 /* eslint-disable @typescript-eslint/no-floating-promises */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import { BadRequest } from "@tsed/exceptions";
+import type { IHypermedia } from "../src/hyper";
 import { Link, Hypermedia } from "../src/hyper";
 import { HTTPMethod } from "../src/uri";
 import nock from "nock";
@@ -47,7 +48,7 @@ describe("Hypermedia", () => {
 
     it("should follow the link and return the data", async () => {
       nock("http://localhost/").delete("/users/1").reply(204);
-      const data = await hypermedia.follow("delete");
+      const data = await hypermedia.follow<IHypermedia>("delete");
       expect(data).toEqual("");
     });
 

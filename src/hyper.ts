@@ -50,25 +50,25 @@ class Hypermedia implements IHypermedia {
     return new Hypermedia(url, response.data);
   }
 
-  private async fetchData(rel: string): Promise<AxiosResponse> {
+  private async fetchData<T = object>(rel: string): Promise<AxiosResponse> {
     const link = this.only(rel);
     if (!link) {
       throw new BadRequest(`Link with rel ${rel} not found`);
     }
     const url = new URL(link.href);
-    return await axios({
+    return await axios<T>({
       method: link.method,
       url: url.href,
     });
   }
 
-  public async follow(rel: string): Promise<any> {
-    const response = await this.fetchData(rel);
+  public async follow<T = object>(rel: string): Promise<T> {
+    const response = await this.fetchData<T>(rel);
     return response.data;
   }
 
-  public async chain(rel: string): Promise<Hypermedia> {
-    const response = await this.fetchData(rel);
+  public async chain<T = object>(rel: string): Promise<Hypermedia> {
+    const response = await this.fetchData<T>(rel);
     return new Hypermedia(new URL(response.data.link.href), response.data.links);
   }
 
