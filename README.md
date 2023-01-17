@@ -1,28 +1,60 @@
-# Create T3 App
+Hyper
+=====
 
-This is a [T3 Stack](https://create.t3.gg/) project bootstrapped with `create-t3-app`.
+Hyper is a JavaScript library that implements the Richardson Maturity Model, level 3 for building adaptable front-ends. It allows developers to easily add Hypermedia controls to their applications, providing a more dynamic and flexible API.
 
-## What's next? How do I make an app with this?
+Benefits of Hypermedia controls
+-------------------------------
 
-We try to keep this project as simple as possible, so you can start with just the scaffolding we set up for you, and add additional things later when they become necessary.
+*   **Decoupling**: Hypermedia controls allow for decoupling the client from the server, enabling the client to adapt to changes in the API without the need for updates.
+*   **Ease of use**: Hypermedia controls are easy to use, providing a simple and consistent way to interact with the API.
+*   **Adaptability**: Hypermedia controls allow for a more adaptable front-end, providing a way to easily change the behavior of the application based on the API's capabilities.
+*   **Discoverability**: Hypermedia controls provide a way for the client to discover the capabilities of the API, making it easy to learn and use the API.
+    
 
-If you are not familiar with the different technologies used in this project, please refer to the respective docs. If you still are in the wind, please join our [Discord](https://t3.gg/discord) and ask for help.
+Installation
+------------
 
-- [Next.js](https://nextjs.org)
-- [NextAuth.js](https://next-auth.js.org)
-- [Prisma](https://prisma.io)
-- [Tailwind CSS](https://tailwindcss.com)
-- [tRPC](https://trpc.io)
+To install Hyper, you can use npm or yarn:
 
-## Learn More
+Copy code
 
-To learn more about the [T3 Stack](https://create.t3.gg/), take a look at the following resources:
+`npm install hyper-media`
 
-- [Documentation](https://create.t3.gg/)
-- [Learn the T3 Stack](https://create.t3.gg/en/faq#what-learning-resources-are-currently-available) — Check out these awesome tutorials
+Copy code
 
-You can check out the [create-t3-app GitHub repository](https://github.com/t3-oss/create-t3-app) — your feedback and contributions are welcome!
+`yarn add hyper-media`
 
-## How do I deploy this?
+Usage
+-----
 
-Follow our deployment guides for [Vercel](https://create.t3.gg/en/deployment/vercel), [Netlify](https://create.t3.gg/en/deployment/netlify) and [Docker](https://create.t3.gg/en/deployment/docker) for more information.
+Here is an example of how to use Hyper:
+
+Copy code
+
+`import { Hypermedia } from "hyper-media";  const address = "http://localhost/hypermedia"; const hypermedia = await Hypermedia.from(address); const links = hypermedia.all(); console.log(links);`
+
+For more usage examples and API documentation, please refer to the [project's GitHub page](https://github.com/jcfigueiredo/hyper)
+
+Contributing
+------------
+
+If you're interested in contributing to Hyper, please check out our [CONTRIBUTING.md](https://github.com/jcfigueiredo/hyper/blob/main/CONTRIBUTING.md) for more information on how to get started.
+
+License
+-------
+
+Hyper is open-sourced software licensed under the [MIT license](https://github.com/jcfigueiredo/hyper/blob/main/LICENSE).
+
+Acknowledgements
+----------------
+
+*   The Hyper library was inspired by the Richardson Maturity Model.
+    
+*   The library uses the axios library for making HTTP requests.
+    
+*   The library uses the nock library for HTTP request mocking during testing.
+    
+*   The library uses the @tsed/exceptions library for handling HTTP exceptions.
+    
+*   The library uses the jest library for testing.
