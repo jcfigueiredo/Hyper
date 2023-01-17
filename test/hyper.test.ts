@@ -1,12 +1,11 @@
-/* eslint-disable @typescript-eslint/no-unsafe-argument */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-floating-promises */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
-import { BadRequest } from "@tsed/exceptions";
 import type { IHypermedia } from "../src/hyper";
 import { Link, Hypermedia } from "../src/hyper";
 import { HTTPMethod } from "../src/uri";
 import nock from "nock";
+import { LinkNotFoundError, InvalidAddressError } from "../src/exceptions";
 
 describe("Hypermedia", () => {
   const updateLink = new Link("update", "http://localhost/users/1", HTTPMethod.PATCH);
@@ -17,9 +16,9 @@ describe("Hypermedia", () => {
 
   const links = [selfLink, updateLink, deleteLink, notesLink];
 
-  it("should throw an error when passed an invalid address", () => {
+  it("should throw an error when passed an invalid address", async () => {
     const address = "invalid-address";
-    expect(Hypermedia.from(address)).rejects.toThrowError(BadRequest);
+    await expect(Hypermedia.from(address)).rejects.toThrow("Invalid URL or endpoint: invalid-address");
   });
 
   describe("Hypermedia", () => {
@@ -41,32 +40,18 @@ describe("Hypermedia", () => {
       expect(link).toEqual(updateLink);
     });
 
-    it("should return undefined if a specific link is not found", () => {
-      const link = hypermedia.only("not-found");
-      expect(link).toBeUndefined();
+    it("should throw error when trying to retrieve a non existing links", () => {
+      expect(() => hypermedia.only("not-found")).toThrow(new LinkNotFoundError("Link with rel 'not-found' not found"));
     });
 
     it("should follow the link and return the data", async () => {
-      nock("http://localhost/").delete("/users/1").reply(204);
+      nock("http://localhost/").delete("/users/1").reply(204, {});
       const data = await hypermedia.follow<IHypermedia>("delete");
-      expect(data).toEqual("");
+      expect(data).toEqual({});
     });
 
-    it("should throw an error if link not found", async () => {
-      await expect(hypermedia.follow("not-found")).rejects.toThrowError(BadRequest);
-    });
-
-    it("should chain multiple follow calls", async () => {
-      nock("http://localhost")
-        .get("/users/1/notes")
-        .reply(200, { notes: ["note1", "note2"] });
-
-      const notes = await hypermedia.follow("notes/create");
-      expect(notes).toEqual({ notes: ["note1", "note2"] });
-    });
-
-    it("should throw an error if link not found", async () => {
-      await expect(hypermedia.chain("not-found")).rejects.toThrowError(BadRequest);
+    it("should throw an error if link not found when following a link", async () => {
+      await expect(hypermedia.follow("not-found")).rejects.toThrow(LinkNotFoundError);
     });
   });
 });

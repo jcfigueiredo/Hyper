@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "test": "jest --runInBand",
+    "test": "jest --runInBand ",
     "test:watch": "yarn run test --watch",
     "test:coverage": "yarn run test --coverage",
     "start": "next start",

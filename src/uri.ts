@@ -1,11 +1,5 @@
 import { URL } from "url";
-
-class InvalidAddressError extends Error {
-  constructor(address: string) {
-    super(`Invalid address: ${address}`);
-    this.name = "InvalidAddressError";
-  }
-}
+import { InvalidAddressError } from "./exceptions";
 
 class URI {
   private url: URL;

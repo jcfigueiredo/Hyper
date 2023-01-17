@@ -1,12 +1,11 @@
 /* eslint-disable @typescript-eslint/no-unsafe-return */
-/* eslint-disable @typescript-eslint/no-unsafe-argument */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
-import { BadRequest } from "@tsed/exceptions";
-import type { HTTPMethod } from "../src/uri";
+import { HTTPMethod, InvalidAddressError } from "../src/uri";
 import type { AxiosResponse } from "axios";
 import axios from "axios";
+import { LinkNotFoundError } from "./exceptions";
 
 interface ILink {
   rel: string;
@@ -24,6 +23,10 @@ class Link {
     this.href = href;
     this.method = method;
   }
+
+  public static get Null(): ILink {
+    return new Link("null-link", "#", HTTPMethod.GET);
+  }
 }
 
 interface IHypermedia {
@@ -33,10 +36,12 @@ interface IHypermedia {
 class Hypermedia implements IHypermedia {
   links: ILink[];
   uri: URL;
+  lastLinkFollowed: ILink;
 
   private constructor(uri: URL, links: ILink[]) {
     this.uri = uri;
     this.links = links;
+    this.lastLinkFollowed = Link.Null;
   }
 
   public static async from(address: string): Promise<Hypermedia> {
@@ -44,22 +49,20 @@ class Hypermedia implements IHypermedia {
     try {
       url = new URL(address);
     } catch (error) {
-      throw new BadRequest(`Invalid URL or endpoint: ${address}`);
+      throw new InvalidAddressError(`Invalid URL or endpoint: ${address}`);
     }
+
     const response = await axios.get<ILink[]>(url.href);
     return new Hypermedia(url, response.data);
   }
 
   private async fetchData<T = object>(rel: string): Promise<AxiosResponse> {
     const link = this.only(rel);
-    if (!link) {
-      throw new BadRequest(`Link with rel ${rel} not found`);
-    }
+
+    this.lastLinkFollowed = link;
+
     const url = new URL(link.href);
-    return await axios<T>({
-      method: link.method,
-      url: url.href,
-    });
+    return await axios<T>({ method: link.method, url: url.href });
   }
 
   public async follow<T = object>(rel: string): Promise<T> {
@@ -67,17 +70,15 @@ class Hypermedia implements IHypermedia {
     return response.data;
   }
 
-  public async chain<T = object>(rel: string): Promise<Hypermedia> {
-    const response = await this.fetchData<T>(rel);
-    return new Hypermedia(new URL(response.data.link.href), response.data.links);
-  }
-
   public all(): ILink[] {
     return this.links;
   }
 
-  public only(rel: string): ILink | undefined {
-    return this.links.find((link: ILink) => link.rel === rel);
+  public only(rel: string): ILink {
+    // return this.links.find((link: ILink) => link.rel === rel) ?? Link.Null;
+    const link = this.links.find((link: ILink) => link.rel === rel);
+    if (link === undefined) throw new LinkNotFoundError(`Link with rel '${rel}' not found`);
+    return link;
   }
 }
 export { Hypermedia, Link };
