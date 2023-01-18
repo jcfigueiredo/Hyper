@@ -10,6 +10,7 @@ const config: jest.Config = {
   },
   modulePathIgnorePatterns: ["./dist/", "./test/mocks.ts"],
   coveragePathIgnorePatterns: ["./test/mocks.ts"],
+  setupFilesAfterEnv: ["./jest.setup.ts"],
 };
 
 export default config;
