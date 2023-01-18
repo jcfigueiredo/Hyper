@@ -1,7 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-return */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
-/* eslint-disable @typescript-eslint/no-unsafe-call */
 import { HTTPMethod, InvalidAddressError } from "../src/uri";
 import type { AxiosResponse } from "axios";
 import axios from "axios";
@@ -67,7 +63,7 @@ class Hypermedia implements IHypermedia {
 
   public async follow<T = object>(rel: string): Promise<T> {
     const response = await this.fetchData<T>(rel);
-    return response.data;
+    return response.data as T;
   }
 
   public all(): ILink[] {

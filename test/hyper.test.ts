@@ -1,11 +1,7 @@
-/* eslint-disable @typescript-eslint/no-unsafe-call */
-/* eslint-disable @typescript-eslint/no-floating-promises */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-import type { IHypermedia } from "../src/hyper";
 import { Link, Hypermedia } from "../src/hyper";
 import { HTTPMethod } from "../src/uri";
 import nock from "nock";
-import { LinkNotFoundError, InvalidAddressError } from "../src/exceptions";
+import { LinkNotFoundError } from "../src/exceptions";
 
 describe("Hypermedia", () => {
   const updateLink = new Link("update", "http://localhost/users/1", HTTPMethod.PATCH);
@@ -46,7 +42,7 @@ describe("Hypermedia", () => {
 
     it("should follow the link and return the data", async () => {
       nock("http://localhost/").delete("/users/1").reply(204, {});
-      const data = await hypermedia.follow<IHypermedia>("delete");
+      const data = await hypermedia.follow<Hypermedia>("delete");
       expect(data).toEqual({});
     });
 
